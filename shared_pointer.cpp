@@ -7,20 +7,11 @@ class shared_pointer{
     int* count;
  public:
 
-    explicit shared_pointer(data_type old_data){
-        data = new data_type(old_data);
-
-        count = new int(1);
-
-    }
-    explicit shared_pointer(shared_pointer &old){
-        data = old.get_data();
-        count = old.get_count();
+    explicit shared_pointer(data_type old_data): data(new data_type(old_data)), count(new int(1)){}
+    explicit shared_pointer(shared_pointer &old): data(old.get_data()), count(old.get_count){
         ++(*count);
     }
-    explicit shared_pointer(shared_pointer &&old){
-        data = old.get_data();
-        count = old.get_count();
+    explicit shared_pointer(shared_pointer &&old): data(old.get_data()), count(old.get_count){
         old.set_data(nullptr);
         old.set_cnt(new int(1));
         ++(*count);
