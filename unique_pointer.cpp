@@ -19,6 +19,7 @@ class unique_pointer{
         data = copy_data.data;
         copy_data.data = nullptr;
     }
+    unique_pointer(unique_pointer* copy_data)=delete;
     unique_pointer& operator=(unique_pointer &&right)=delete;
     unique_pointer& operator=(unique_pointer &right)=delete;
     

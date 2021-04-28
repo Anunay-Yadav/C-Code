@@ -22,7 +22,7 @@ class shared_pointer{
         data = old.get_data();
         count = old.get_count();
         old.set_data(nullptr);
-        old.set_cnt(1);
+        old.set_cnt(new int(1));
         ++(*count);
     }
     
