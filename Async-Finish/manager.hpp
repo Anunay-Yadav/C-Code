@@ -9,4 +9,5 @@ namespace manager{
         void finish();
         void thread_fetch_execute();
         void finalize();
+        void display();
 };

@@ -1,6 +1,6 @@
 
 #ifndef MANAGER
-#include "manager.hpp"
+    #include "manager.hpp"
 #endif
 #include <thread>
 #include <mutex>
@@ -11,15 +11,14 @@
 namespace manager{
     std::queue<std::unique_ptr<task>> Queue;
     std::vector<std::thread> all_threads;
-    int size;
     int shutdown;
     int thread_num;
-    std::mutex my_push_mutex;
-    std::mutex my_pop_mutex;
+    std::mutex my_mutex;
 }
-
+void manager::display(){
+    std::cout << "Queueu size ::: " <<  Queue.size() << std::endl;
+}
 void manager::start(int num){
-    size = 0;
     shutdown = 0;
     thread_num = num;
     for(int i = 0;i < thread_num; i++){
@@ -27,18 +26,15 @@ void manager::start(int num){
     }
 }
 void manager::push(void (*heap_f)(void*), void* args){
-    std::lock_guard<std::mutex> guard(my_push_mutex);
-    std::unique_ptr<task> f1 = std::make_unique<task>(heap_f,args);
-    Queue.push(std::move(f1));
-    size++;
+    std::lock_guard<std::mutex> guard(my_mutex);
+    Queue.push(std::make_unique<task>(heap_f,args));
 }
 
 std::unique_ptr<task> manager::pop_execute(){
-    std::lock_guard<std::mutex> guard(my_pop_mutex);
+    std::lock_guard<std::mutex> guard(my_mutex);
     if(Queue.empty()) return std::unique_ptr<task>(nullptr);
     std::unique_ptr<task> k(std::move(Queue.front()));
     Queue.pop();
-    size--;
     return k;
 }
 
@@ -47,9 +43,12 @@ void manager::finalize(){
     for(int i = 0;i < thread_num; i++){
         all_threads[i].join();
     }
+    all_threads.clear();
+    shutdown = 0;
+    thread_num = 0;
 }
 void manager::finish(){
-    while(Queue.empty() != 0){
+    while(!Queue.empty()){
         std::unique_ptr<task> k(std::move(pop_execute()));
         if(k != nullptr){
             k -> execute();

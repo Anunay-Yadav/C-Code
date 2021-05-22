@@ -5,6 +5,7 @@
 
 class task{
     public :
+        int flag = 0;
         void (*heap_f)(void*);
         void* arguments;
 
@@ -14,5 +15,5 @@ class task{
         task(task &a);
         bool execute();
         void operator()();
-        ~task(){}
+        ~task();
 };

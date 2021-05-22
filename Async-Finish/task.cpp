@@ -16,7 +16,7 @@ task::task(task & a): heap_f(a.heap_f), arguments(a.arguments){}
 
 bool task::execute(){
     try{
-        (*heap_f)(arguments);
+            heap_f(arguments);
     }
     catch(char* mess){
         std::cout << "Exception :" << mess << std::endl;
@@ -33,4 +33,8 @@ void task::operator()(){
     if(!x){
         std::cout << "Execution stopped" << std::endl;
     }
+}
+task::~task(){
+    int* a = static_cast<int*>(arguments);
+    delete[] a;
 }
