@@ -9,7 +9,7 @@ class task{
         void* arguments;
 
     
-        task(void (*func)(void*),void* arguments);
+        task(void func(void*),void* arguments);
         task(task && a);
         task(task &a);
         bool execute();

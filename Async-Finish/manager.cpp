@@ -35,7 +35,7 @@ void manager::push(void (*heap_f)(void*), void* args){
 
 std::unique_ptr<task> manager::pop_execute(){
     std::lock_guard<std::mutex> guard(my_pop_mutex);
-    if(Queue.size() == 0) return std::unique_ptr<task>(nullptr);
+    if(Queue.empty()) return std::unique_ptr<task>(nullptr);
     std::unique_ptr<task> k(std::move(Queue.front()));
     Queue.pop();
     size--;
@@ -49,7 +49,7 @@ void manager::finalize(){
     }
 }
 void manager::finish(){
-    while(size != 0){
+    while(Queue.empty() != 0){
         std::unique_ptr<task> k(std::move(pop_execute()));
         if(k != nullptr){
             k -> execute();
