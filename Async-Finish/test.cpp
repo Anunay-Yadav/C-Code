@@ -10,15 +10,7 @@ int a[SIZE][SIZE];
 int b[SIZE][SIZE];
 int c[SIZE][SIZE];
 int c_correct[SIZE][SIZE];
-void function(void* arg){
-    int* ind = static_cast<int*>(arg);
-    int x = ind[0];
-    int y = ind[1];
-    for(int i = 0;i < SIZE; i++){
-        c[x][y] += a[x][i]*b[i][y];
-    }
-    // std::cout << x << " " << y << std::endl;
-}
+
 void function_correct(int x, int y){
     for(int i = 0;i < SIZE; i++){
         c_correct[x][y] += a[x][i]*b[i][y];
@@ -33,25 +25,24 @@ int main(){
             }
         }
         auto start = high_resolution_clock::now();
-
-        manager::start(8);
+        manager task_handler(8);
 
         for (int i = 0; i < SIZE; i++) {
             for(int j = 0;j < SIZE; j++){
-                int* p = new int[2];
-                p[0] = i;
-                p[1] = j;
-                manager::push(function,static_cast<void*>(p));   
-                // manager::push(function,nullptr);   
+                task_handler.push([](int x, int y){
+                    for(int i1 = 0;i1 < SIZE; i1++){
+                        c[x][y] += a[x][i1]*b[i1][y];
+                    }
+                },i , j);   
             }
         }
         std::cout << "Started" << std::endl;
-        manager::finish();
-        manager::finalize();
+        task_handler.finish();
+        task_handler.finalize();
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - start);
         std::cout << "Parrallel   " << duration.count() << "ms" << std::endl;
-        manager::display();
+        task_handler.display();
 
         auto start1 = high_resolution_clock::now();
         memset(c_correct,0,sizeof(c_correct));
