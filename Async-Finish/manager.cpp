@@ -18,12 +18,13 @@ manager::manager(int num){
 }
 
 
-std::function<void()> manager::pop_execute(){
+void manager::pop_execute(){
     std::lock_guard<std::mutex> guard(my_mutex);
-    if(Queue.empty()) return nullptr;
+    if(Queue.empty()) return ;
+    // manager::display();
     auto k = Queue.front();
     Queue.pop();
-    return k;
+    k();
 }
 
 void manager::finalize(){
@@ -37,38 +38,12 @@ void manager::finalize(){
 }
 void manager::finish(){
     while(!Queue.empty()){
-        auto k = pop_execute();
-        if(k != nullptr){
-            k();
-        }
+        pop_execute();
     }
 }
 
 void manager::thread_fetch_execute(){
     while(shutdown != 1){
-        auto k = pop_execute();
-        if(k != nullptr){
-            k();
-        }
+        pop_execute();
     }
 }
-// void manager::for_async_1d(loop t, void func(void*) , void* arg,  MODE mode){
-//     if(mode == RECURSIVE){
-        
-//     }
-//     else if(mode == FLAT){
-
-//     }
-
-// }
-
-// void manager::flat_1d_gen(loop t, void func(void*,int), void* arg ){
-//     for(int i = t.start; i < t.end ; i+=t.tile_size){
-//         int ind = i;
-//         for(int j = 0;j < t.tile_size ;j++){
-//             manager::push([](void*) {
-                
-//             }, arg );
-//         }
-//     }
-// }

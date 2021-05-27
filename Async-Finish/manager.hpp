@@ -28,15 +28,29 @@ class manager{
                 template <typename Function, typename... Args>
                 void push(Function&& f, Args&&... args) {
                         std::lock_guard<std::mutex> guard(my_mutex);
-                        Queue.push([=]{ std::invoke(f, args...);  return 1;});
+                        Queue.push([=]{ std::invoke(f, args...);});
                 }
 
-                std::function<void()> pop_execute();
+                void pop_execute();
                 manager(int num);
                 void finish();
                 void thread_fetch_execute();
                 void finalize();
                 void display();
-                void for_async_1d(loop , void func(void*) , void*, MODE mode);
-                void flat_1d_gen(loop, void func(void*), void*);
+
+                template <typename Function, typename... Args>
+                void for_async_1d(loop loop_t, MODE mode, Function&& f,Args&&... args){
+                        if( mode == FLAT) {
+                                for(int i = loop_t.start; i < loop_t.end; i += loop_t.tile_size){
+                                        for(int j = 0;j < loop_t.tile_size; j += loop_t.step){
+                                                int index = i + j;
+                                                Queue.push([=]{ std::invoke(f,index,args...);});
+                                        }
+                                }
+                        }
+                        else if(mode == RECURSIVE){
+                                 // Working on it
+                        }
+                }
+                
 };

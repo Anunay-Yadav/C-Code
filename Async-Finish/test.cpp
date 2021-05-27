@@ -5,7 +5,7 @@
 using namespace std::chrono;
 #include <unistd.h>
 #include <cstring>
-#define SIZE 1000
+#define SIZE 250
 int a[SIZE][SIZE];
 int b[SIZE][SIZE];
 int c[SIZE][SIZE];
@@ -27,15 +27,24 @@ int main(){
         auto start = high_resolution_clock::now();
         manager task_handler(8);
 
-        for (int i = 0; i < SIZE; i++) {
+        for(int i = 0;i < SIZE; i++){
             for(int j = 0;j < SIZE; j++){
-                task_handler.push([](int x, int y){
-                    for(int i1 = 0;i1 < SIZE; i1++){
-                        c[x][y] += a[x][i1]*b[i1][y];
+                task_handler.push([](int x,int y){
+                    for(int z = 0;z < SIZE; z++){
+                        c[x][y] += a[x][z]*b[z][y];
                     }
-                },i , j);   
+                },i,j);
             }
         }
+        // loop t(0,SIZE,1,SIZE);
+        // task_handler.for_async_1d(t,FLAT, [](int x){
+        //     for (int y = 0; y < SIZE; y++) {
+        //         for(int i1 = 0;i1 < SIZE; i1++){
+        //             c[x][y] += a[x][i1]*b[i1][y];
+        //         }
+        //     }
+        // });   
+
         std::cout << "Started" << std::endl;
         task_handler.finish();
         task_handler.finalize();
