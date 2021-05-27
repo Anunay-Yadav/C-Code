@@ -27,21 +27,28 @@ int main(){
         auto start = high_resolution_clock::now();
         manager task_handler(8);
 
-        for(int i = 0;i < SIZE; i++){
-            for(int j = 0;j < SIZE; j++){
-                task_handler.push([](int x,int y){
-                    for(int z = 0;z < SIZE; z++){
-                        c[x][y] += a[x][z]*b[z][y];
-                    }
-                },i,j);
+        // for(int i = 0;i < SIZE; i++){
+        //     for(int j = 0;j < SIZE; j++){
+        //         task_handler.push([](int x,int y){
+        //             for(int z = 0;z < SIZE; z++){
+        //                 c[x][y] += a[x][z]*b[z][y];
+        //             }
+        //         },i,j);
+        //     }
+        // }
+        loop t(0,SIZE,1,SIZE);
+        task_handler.for_async_1d(t,FLAT, [](int x){
+            for (int y = 0; y < SIZE; y++) {
+                for(int i1 = 0;i1 < SIZE; i1++){
+                    c[x][y] += a[x][i1]*b[i1][y];
+                }
             }
-        }
-        // loop t(0,SIZE,1,SIZE);
-        // task_handler.for_async_1d(t,FLAT, [](int x){
-        //     for (int y = 0; y < SIZE; y++) {
-        //         for(int i1 = 0;i1 < SIZE; i1++){
-        //             c[x][y] += a[x][i1]*b[i1][y];
-        //         }
+        });   
+
+        // loop2d t(0,0,SIZE,SIZE,1,1);
+        // task_handler.for_async_2d(t,FLAT, [](int x,int y){
+        //     for(int i1 = 0;i1 < SIZE; i1++){
+        //         c[x][y] += a[x][i1]*b[i1][y];
         //     }
         // });   
 
