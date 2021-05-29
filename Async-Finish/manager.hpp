@@ -1,5 +1,5 @@
 #include "task.hpp"
-#include<memory>
+#include <memory>
 #include <list>
 #include <functional>
 #include <type_traits>
@@ -8,8 +8,8 @@
 #include <queue>
 #include <vector>
 #include <memory>
-
-
+#include <map>
+#include <utility>
 class loop{
         public:
                 int start,end,step, tile_size;
@@ -34,14 +34,28 @@ class manager{
                 int shutdown;
                 int thread_num;
                 std::mutex my_mutex;
-
+                std::map<int,std::unique_ptr<std::mutex>> lock;
+                std::mutex map_mutex;
 
                 manager(int num);
 
                 template <typename Function, typename... Args>
                 void push(Function&& f, Args&&... args) {
                         std::lock_guard<std::mutex> guard(my_mutex);
-                        Queue.push([=]{ std::invoke(f, args...);});
+                        Queue.push([=]{ f(args...);});
+                }
+
+                template <typename Function, typename... Args>
+                void isolate(Function&& f, int id, Args&&... args) {
+                        
+                        if(lock.find(id) == lock.end()){
+                                map_mutex.lock();
+                                lock.emplace(id,new std::mutex);
+                                map_mutex.unlock();
+                        }
+                        lock[id] -> lock();
+                        f(args...);
+                        lock[id] -> unlock();
                 }
 
                 void pop_execute();

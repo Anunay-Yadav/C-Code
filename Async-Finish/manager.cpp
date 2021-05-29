@@ -35,6 +35,7 @@ void manager::finalize(){
     all_threads.clear();
     shutdown = 0;
     thread_num = 0;
+    lock.clear();
 }
 void manager::finish(){
     while(!Queue.empty()){
