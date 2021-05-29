@@ -46,6 +46,12 @@ class manager{
                 std::queue<std::function<void()>> Queue;
                 manager(int num);
 
+                void pop_execute();
+                void finish();
+                void thread_fetch_execute();
+                void finalize();
+                void display() const;
+
                 template <typename Function, typename... Args>
                 void push(Function&& f, Args&&... args) {
                         my_mutex.lock();
@@ -65,12 +71,6 @@ class manager{
                         std::invoke(f,args...);
                         lock[id.id] -> unlock();
                 }
-
-                void pop_execute();
-                void finish();
-                void thread_fetch_execute();
-                void finalize();
-                void display() const;
 
                 template <typename Function, typename... Args>
                 void for_async_1d(loop loop_t, MODE mode, Function&& f,Args&&... args){
