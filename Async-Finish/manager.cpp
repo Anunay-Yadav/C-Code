@@ -5,6 +5,20 @@
 #endif
 
 
+bool operator<(const call_id &lhs,const call_id &rhs){
+        return lhs.id < rhs.id;  
+}
+
+std::set<int> call_id::list_of_id;
+
+call_id::call_id(){
+    int k = abs(rand());
+    while(call_id::list_of_id.find(k) != call_id::list_of_id.end()){
+            k = abs(rand());
+    }
+    call_id::list_of_id.insert(k);
+    id = k;
+}
 
 void manager::display() const{
     std::cout << "Queueu size ::: " <<  Queue.size() << std::endl;
@@ -19,11 +33,15 @@ manager::manager(int num){
 
 
 void manager::pop_execute(){
-    std::lock_guard<std::mutex> guard(my_mutex);
-    if(Queue.empty()) return ;
+    my_mutex.lock();
+    if(Queue.empty()) {
+        my_mutex.unlock();    
+        return ;
+    }
     // manager::display();
     auto k = Queue.front();
     Queue.pop();
+    my_mutex.unlock();
     k();
 }
 

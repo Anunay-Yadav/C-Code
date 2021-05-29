@@ -1,10 +1,8 @@
-default: 
-	g++ -g -std=c++17 -fsanitize=address -Wall -pthread test.cpp task.cpp manager.cpp 
-	./a.out	
-	# rm a.out
+default: test1 test2 
+
 test1:
 	g++ -g -std=c++17 -fsanitize=address -Wall -pthread test.cpp task.cpp manager.cpp 
-	./a.out	
+	./a.out
 test2:
-	g++ -g -std=c++17 -fsanitize=address -Wall -pthread test2.cpp task.cpp manager.cpp 
-	./a.out	
+	g++ -std=c++17 -fsanitize=address -Wall -pthread test2.cpp task.cpp manager.cpp 
+	./a.out

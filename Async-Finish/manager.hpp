@@ -10,15 +10,14 @@
 #include <memory>
 #include <map>
 #include <utility>
-class loop{
-        public:
+#include <set>
+struct loop{
                 int start,end,step, tile_size;
                 loop(int start, int end, int step, int tile_size) : start(start), end(end), step(step), tile_size(tile_size){}
                 loop(const loop &a) : start(a.start), end(a.end), step(a.step), tile_size(a.tile_size){}
 };
 
-class loop2d{
-        public:
+struct loop2d{
                 int start1,start2,end1,end2,step1,step2;
                 loop2d(int start1,int start2,int end1,int end2,int step1,int step2) : start1(start1), start2(start2), end1(end1), end2(end2), step1(step1), step2(step2){}
                 loop2d(const loop2d &a) : start1(a.start1), start2(a.start2), end1(a.end1), end2(a.end2), step1(a.step1), step2(a.step2){}
@@ -27,35 +26,44 @@ enum MODE{
         RECURSIVE, FLAT
 };
 
+class call_id{
+        static std::set<int> list_of_id;
+        
+        public:
+
+        int id;
+        call_id();
+};
+
 class manager{
         public:
-                std::queue<std::function<void()>> Queue;
-                std::vector<std::thread> all_threads;
                 int shutdown;
                 int thread_num;
+                std::vector<std::thread> all_threads;
                 std::mutex my_mutex;
-                std::map<int,std::unique_ptr<std::mutex>> lock;
                 std::mutex map_mutex;
-
+                std::map<int,std::unique_ptr<std::mutex>> lock;
+                std::queue<std::function<void()>> Queue;
                 manager(int num);
 
                 template <typename Function, typename... Args>
                 void push(Function&& f, Args&&... args) {
-                        std::lock_guard<std::mutex> guard(my_mutex);
-                        Queue.push([=]{ f(args...);});
+                        my_mutex.lock();
+                        Queue.push([=]{ std::invoke(f,args...);});
+                        my_mutex.unlock();
                 }
 
                 template <typename Function, typename... Args>
-                void isolate(Function&& f, int id, Args&&... args) {
+                void isolate(Function&& f, call_id id, Args&&... args) {
                         
-                        if(lock.find(id) == lock.end()){
+                        if(lock.find(id.id) == lock.end()){
                                 map_mutex.lock();
-                                lock.emplace(id,new std::mutex);
+                                lock.emplace(id.id,new std::mutex);
                                 map_mutex.unlock();
                         }
-                        lock[id] -> lock();
-                        f(args...);
-                        lock[id] -> unlock();
+                        lock[id.id] -> lock();
+                        std::invoke(f,args...);
+                        lock[id.id] -> unlock();
                 }
 
                 void pop_execute();

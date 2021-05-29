@@ -1,3 +1,4 @@
+#include <cstdlib>
 #ifndef MANAGER
 #include "manager.hpp"
 #endif
@@ -6,18 +7,27 @@ using namespace std::chrono;
 #include <unistd.h>
 #include <cstring>
 #define SIZE 250
-
+void f(std::unique_ptr<int> &count){
+    int k = *count;
+    // sleep(abs(rand())%10 + 1000*(k == 1));
+    std::cout << k << " " << *count << std::endl;
+    k++;
+    *count = k;
+}
 int main(){
-    for(int i1 = 0; i1 < 100; i1++){
-        manager task_handler(8);
-        std::unique_ptr<int> count (new int(0));
-        for(int i = 0;i < 1000; i++){
+    for(int i1 = 0; i1 < 1; i1++){
+        manager task_handler(16);
+        std::cout << sizeof(task_handler) << std::endl;
+        std::unique_ptr<int> count(new int(0));
+        call_id a1,a2;
+        for(int i = 0;i < 500; i++){
             task_handler.push([&]{
-                for(int j = 0;j < 500; j++){
                     task_handler.isolate([&]{
                         (*count)++;
-                    }, 1);
-                }
+                    }, a1);
+                    task_handler.isolate([&]{
+                        (*count)++;
+                    }, a1);
             });
         }
         task_handler.finish();
