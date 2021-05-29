@@ -1,11 +1,11 @@
 #ifndef MANAGER
-#include "manager.hpp"
+#include "../header files/manager.hpp"
 #endif
 #include <chrono>
 using namespace std::chrono;
 #include <unistd.h>
 #include <cstring>
-#define SIZE 250
+#define SIZE 100
 int a[SIZE][SIZE];
 int b[SIZE][SIZE];
 int c[SIZE][SIZE];
@@ -36,6 +36,7 @@ int main(){
         //         },i,j);
         //     }
         // }
+        
         loop t(0,SIZE,1,SIZE);
         task_handler.for_async_1d(t,FLAT, [](int x){
             for (int y = 0; y < SIZE; y++) {
