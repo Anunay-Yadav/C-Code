@@ -1,7 +1,8 @@
 #include <cstdlib>
 #ifndef MANAGER
-#include "../header files/manager.hpp"
+    #include "../header files/manager.hpp"
 #endif
+#include <iostream>
 #include <chrono>
 using namespace std::chrono;
 #include <unistd.h>
@@ -14,6 +15,7 @@ void f(std::unique_ptr<int> &count){
     k++;
     *count = k;
 }
+
 int main(){
     for(int i1 = 0; i1 < 1; i1++){
         manager task_handler(16);
@@ -21,7 +23,7 @@ int main(){
         std::unique_ptr<int> count(new int(0));
         call_id a1,a2;
         for(int i = 0;i < 500; i++){
-            task_handler.push([&]{
+            task_handler.async([&]{
                     task_handler.isolate([&]{
                         (*count)++;
                     }, a1);
