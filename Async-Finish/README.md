@@ -1,9 +1,9 @@
-# Friendly Farmers 101      <img src="https://commons.wikimedia.org/wiki/File:ISO_C%2B%2B_Logo.svg" height="30"> 
+# Async Finish API
 
 ## About this project
 
 ### The idea:
-To create a work sharing parrallel programming api, supporting isolation, fast launching and future returns.
+To create a Async finish work sharing api, supporting isolation, fast launching and future returns.
 
 
 ## Features Supported
