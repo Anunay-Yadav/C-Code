@@ -1,4 +1,5 @@
 #include "task.hpp"
+#include "future_t.hpp"
 #include <memory>
 #include <list>
 #include <functional>
@@ -52,11 +53,35 @@ class manager{
                 void finalize();
                 void display() const;
 
-                template <typename Function, typename... Args>
+                template <typename Function, typename... Args, typename = typename std::enable_if<!std::is_void<std::result_of_t<Function(Args...)>>::value>::type>
+                future_t<std::result_of_t<Function(Args...)>>* push(Function&& f, Args&&... args) {
+                        future_t<std::result_of_t<Function(Args...)>>* ref = new future_t<std::result_of_t<Function(Args...)>>();
+                        my_mutex.lock();
+                        Queue.push([=]{ 
+                                ref -> status = RUNNING;
+                                ref -> return_val = std::invoke(f,args...);
+                                ref -> status = DONE;
+                        });
+                        ref -> status = PUSHED;
+                        my_mutex.unlock();
+                        return ref;
+                }
+
+                template <typename Function, typename... Args, typename = typename std::enable_if<!std::is_void<std::result_of_t<Function(Args...)>>::value>::type>
+                future_t<std::result_of_t<Function(Args...)>>* async(Function&& f, Args&&... args){
+                        return push(f,args...);
+                }
+
+                template <typename Function, typename... Args, typename = typename std::enable_if<std::is_void<std::result_of_t<Function(Args...)>>::value>::type>
                 void push(Function&& f, Args&&... args) {
                         my_mutex.lock();
                         Queue.push([=]{ std::invoke(f,args...);});
                         my_mutex.unlock();
+                }
+
+                template <typename Function, typename... Args, typename = typename std::enable_if<std::is_void<std::result_of_t<Function(Args...)>>::value>::type>
+                void async(Function&& f, Args&&... args){
+                        push(f,args...);
                 }
 
                 template <typename Function, typename... Args>
