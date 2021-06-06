@@ -17,12 +17,6 @@ To create a Async finish work sharing api, supporting isolation, fast launching 
 2. test2 -> tests mutual exclusion
 3. test3 -> tests working of future_t (future return).
 
-
-## Contributing
-
-First, read the [contribution guidelines](CONTRIBUTING.md). Ensure you understand the code.
-
-
 ### Help
 Reach out to any of the developers in case of any issues/concerns
 
